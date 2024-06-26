@@ -1,8 +1,12 @@
 [Unit]
-Description=My test script
+Description=My test case
 After=network.target
 
-[Servise]
+[Service]
 Type=simple
-WorkingDirectory=./
-ExecStart=
+WorkingDirectory=/home/any4rd/projects/test_keyboard
+ExecStart=/home/any4rd/projects/test_keyboard/venv/bin/python /home/any4rd/projects/test_keyboard/main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target 
