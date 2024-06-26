@@ -1,0 +1,8 @@
+[Unit]
+Description=My test script
+After=network.target
+
+[Servise]
+Type=simple
+WorkingDirectory=./
+ExecStart=
