@@ -1,3 +1,6 @@
+import Xlib
+import Xlib.display
+
 from pynput import mouse, keyboard
 import paho.mqtt.client as mqtt
 
@@ -17,6 +20,16 @@ def publish_message(topic, message):
 pressed_keys = {}
 # Флаг для выполнения скрипта
 running = True
+
+
+# Функция для получения английской раскладки клавиатуры
+def get_english_key(key): 
+    display = Xlib.display.Display()
+    keysym = display.keycode_to_keysym(key, 0)
+    if keysym: 
+        return Xlib.XK.keysym_to_string(keysym)
+    else: 
+        return None
 
 
 # Функция для обработки событий клавиатуры (при нажатой клавише)
