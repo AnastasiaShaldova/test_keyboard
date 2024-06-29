@@ -1,12 +1,12 @@
 [Unit]
 Description=My test case
-After=network.target
+After=graphical.target
 
 [Service]
-Type=simple
-WorkingDirectory=/home/any4rd/projects/test_keyboard
+User=any4rd
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=/home/any4rd/.Xauthority"
 ExecStart=/home/any4rd/projects/test_keyboard/venv/bin/python /home/any4rd/projects/test_keyboard/main.py
-Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=default.target

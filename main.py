@@ -9,12 +9,16 @@ client.connect("localhost", 1883)
 
 
 # Отправка сообщения в топик
+def publish_message(topic, message):
+    client.publish(topic, message)
+
+
 def topic_keyboard(message):
-    client.publish("keyboard", message)
+    return f"keyboard/{message}"
 
 
 def topic_mouse(message):
-    client.publish("mouse", message)
+    return f"mouse/{message}"
 
 
 # Тут храним нажатые клавиши
@@ -39,11 +43,10 @@ def on_key_pressed(key):
         button_pressed = replace_russian_with_english(key.char)
     except AttributeError:
         button_pressed = str(key).split(".")[1]
-    if button_pressed not in pressed_keys or not pressed_keys[button_pressed]:
-        message = f"{button_pressed} = 1"
-        topic_keyboard(message)
-        pressed_keys[button_pressed] = True
-
+    
+    topic = topic_keyboard(button_pressed)
+    message = "1"
+    publish_message(topic, message)
 
 # Функция для обработки событий клавиатуры (при отпущенной клавише)
 def on_key_released(key):
@@ -51,21 +54,24 @@ def on_key_released(key):
         button_released = replace_russian_with_english(key.char)
     except AttributeError:
         button_released = str(key).split(".")[1]
-    message = f"{button_released} = 0"
-    topic_keyboard(message)
-    pressed_keys[button_released] = False
+
+    topic = topic_keyboard(button_released)
+    message = "0"
+    publish_message(topic, message)
 
 
 # Функция для обработки событий мыши
 def on_mouse_event(x, y, button, pressed):
     if pressed:
         button_pressed = button.name
-        message = f"{button_pressed} = 1"
-        topic_mouse(message)
+        topic = topic_mouse(button_pressed)
+        message = "1"
+        publish_message(topic, message)
     else:
         button_released = button.name
-        message = f"{button_released} = 0"
-        topic_mouse(message)
+        topic = topic_mouse(button_released)
+        message = "0"
+        publish_message(topic, message)
 
 
 def stop_script():
