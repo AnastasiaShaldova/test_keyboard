@@ -1,6 +1,3 @@
-import Xlib
-import Xlib.display
-
 from pynput import mouse, keyboard
 import paho.mqtt.client as mqtt
 
@@ -22,20 +19,20 @@ pressed_keys = {}
 running = True
 
 
-# Функция для получения английской раскладки клавиатуры
-def get_english_key(key): 
-    display = Xlib.display.Display()
-    keysym = display.keycode_to_keysym(key, 0)
-    if keysym: 
-        return Xlib.XK.keysym_to_string(keysym)
-    else: 
-        return None
+# Функция для замены русских букв на английские
+def replace_russian_with_english(letter):
+    keyboard_letters = {
+        "й": "q", "ц": "w", "у": "e", "к": "r", "е": "t", "н": "y", "г": "u", "ш": "i", "щ": "o", "з": "p", "х": "[",
+        "ъ": "]", "ф": "a", "ы": "s", "в": "d", "а": "f", "п": "g", "р": "h", "о": "j", "л": "k", "д": "l", "ж": ";",
+        "э": "'", "я": "z", "ч": "x", "с": "c", "м": "v", "и": "b", "т": "n", "ь": "m", "б": ",", "ю": "."
+    }
+    return keyboard_letters.get(letter, letter)
 
 
 # Функция для обработки событий клавиатуры (при нажатой клавише)
 def on_key_pressed(key):
     try:
-        button_pressed = key.char
+        button_pressed = replace_russian_with_english(key.char)
     except AttributeError:
         button_pressed = str(key).split(".")[1]
     topic = "keyboard"
@@ -43,20 +40,18 @@ def on_key_pressed(key):
         message = f"{button_pressed} = 1"
         publish_message(topic, message)
         pressed_keys[button_pressed] = True
-        print(message)
 
 
 # Функция для обработки событий клавиатуры (при отпущенной клавише)
 def on_key_released(key):
     try:
-        button_released = key.char
+        button_released = replace_russian_with_english(key.char)
     except AttributeError:
         button_released = str(key).split(".")[1]
     topic = "keyboard"
     message = f"{button_released} = 0"
     publish_message(topic, message)
     pressed_keys[button_released] = False
-    print(message)
 
 
 # Функция для обработки событий мыши
@@ -66,18 +61,15 @@ def on_mouse_event(x, y, button, pressed):
         topic = "mouse"
         message = f"{button_pressed} = 1"
         publish_message(topic, message)
-        print(message)
     else:
         button_released = button.name
         topic = "mouse"
         message = f"{button_released} = 0"
         publish_message(topic, message)
-        print(message)
 
 
 def stop_script():
     global running
-    print("Остановка скрипта")
     running = False
 
 
