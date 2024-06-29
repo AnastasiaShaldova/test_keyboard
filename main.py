@@ -1,7 +1,4 @@
-import subprocess
-
-import keyboard
-from pynput import mouse
+from pynput import mouse, keyboard
 import paho.mqtt.client as mqtt
 
 # Создаем клиент MQTT
@@ -11,47 +8,70 @@ client = mqtt.Client()
 client.connect("localhost", 1883)
 
 
+# Отправка сообщения в топик
 def publish_message(topic, message):
     client.publish(topic, message)
 
 
-# Функция для обработки событий клавиатуры
-def on_key_event(event):
-    print(event)
-    if event.event_type == keyboard.KEY_DOWN:
-        key_pressed = event.name
-        if key_pressed in ['backspace', 'ctrl', 'alt', 'j', 'b']:
-            topic = "topic1"
-            message = "good job"
-            print(message)
-            publish_message(topic, message)
-        if key_pressed in ['1', '2', '3', '4', '5']:
-            topic = "topic2"
-            message = "WoW"
-            publish_message(topic, message)
-            print(message)
-        if key_pressed in ['p', 'q', 'r', 's', 'n']:
-            topic = "topic3"
-            message = f"Hello '{key_pressed}'!"
-            publish_message(topic, message)
-            print(message)
+# Тут храним нажатые клавиши
+pressed_keys = {}
+# Флаг для выполнения скрипта
+running = True
+
+
+# Функция для обработки событий клавиатуры (при нажатой клавише)
+def on_key_pressed(key):
+    try:
+        button_pressed = key.char
+    except AttributeError:
+        button_pressed = str(key).split(".")[1]
+    topic = "keyboard"
+    if button_pressed not in pressed_keys or not pressed_keys[button_pressed]:
+        message = f"{button_pressed} = 1"
+        publish_message(topic, message)
+        pressed_keys[button_pressed] = True
+        print(message)
+
+
+# Функция для обработки событий клавиатуры (при отпущенной клавише)
+def on_key_released(key):
+    try:
+        button_released = key.char
+    except AttributeError:
+        button_released = str(key).split(".")[1]
+    topic = "keyboard"
+    message = f"{button_released} = 0"
+    publish_message(topic, message)
+    pressed_keys[button_released] = False
+    print(message)
 
 
 # Функция для обработки событий мыши
 def on_mouse_event(x, y, button, pressed):
     if pressed:
         button_pressed = button.name
-        if button_pressed in ['left', 'right', 'up', 'down']:
-            topic = "mouse"
-            message = f"Нажата кнопка: {button_pressed}"
-            publish_message(topic, message)
-            print(message)
+        topic = "mouse"
+        message = f"{button_pressed} = 1"
+        publish_message(topic, message)
+        print(message)
+    else:
+        button_released = button.name
+        topic = "mouse"
+        message = f"{button_released} = 0"
+        publish_message(topic, message)
+        print(message)
+
+
+def stop_script():
+    global running
+    print("Остановка скрипта")
+    running = False
 
 
 # Регистрация обработчиков событий клавиатуры и мыши
-keyboard.on_press(on_key_event)
-mouse.Listener(on_click=on_mouse_event).start()
+listener_key = keyboard.Listener(on_press=on_key_pressed, on_release=on_key_released).start()
+listener_mouse = mouse.Listener(on_click=on_mouse_event).start()
 
-# 'esc' для остановки скрипта
-keyboard.wait("esc")
-
+# Постоянное выполнение скрипта
+while running:
+    pass
