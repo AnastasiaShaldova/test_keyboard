@@ -17,7 +17,7 @@ python3 -m venv venv
 ```bash
 pip install -r requirements.txt
 ```
-5. Создаем файл в systemd и копируем туда из файла репозитория .systemd (заменить пути до виртуального окружения и исполняемго файла)
+5. Создаем файл в systemd и копируем туда из файла репозитория test-keyboard.service (заменить пути до виртуального окружения и исполняемго файла)
 ```bash
 sudo vim /etc/systemd/system/test_keyboard.service
 ```
