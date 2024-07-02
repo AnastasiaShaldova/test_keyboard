@@ -17,19 +17,20 @@ python3 -m venv venv
 ```bash
 pip install -r requirements.txt
 ```
-5. Создаем файл в systemd и копируем туда из файла репозитория test-keyboard.service (заменить пути до виртуального окружения и исполняемго файла)
+5. Скопировать переменные из файла .env.example в .env файл который должен находится в корне проекта. Прописать необходимые данные для подключения к MQTT. 
+6. Создаем файл в systemd и копируем туда из файла репозитория test-keyboard.service (заменить пути до виртуального окружения и исполняемго файла)
 ```bash
 sudo vim /etc/systemd/system/test_keyboard.service
 ```
-6. Перезагрузите systemd, чтобы он обнаружил новый юнит-файл
+7. Перезагрузите systemd, чтобы он обнаружил новый юнит-файл
 ```bash 
 sudo systemctl daemon-reload
 ```
-7. Запустите сервис
+8. Запустите сервис
 ```bash
 sudo systemctl start test_keyboard
 ```
-8. Настройте автозапуск сервиса при загрузке
+9. Настройте автозапуск сервиса при загрузке
 ```bash
 sudo systemctl enable test_keyboard
 ```
